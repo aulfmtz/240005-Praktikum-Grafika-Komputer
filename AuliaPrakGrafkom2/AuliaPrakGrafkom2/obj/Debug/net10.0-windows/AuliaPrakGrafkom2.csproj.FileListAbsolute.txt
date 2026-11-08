@@ -1,0 +1,17 @@
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\AuliaPrakGrafkom2.Form1.resources
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\AuliaPrakGrafkom2.csproj.GenerateResource.cache
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\AuliaPrakGrafkom2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\AuliaPrakGrafkom2.AssemblyInfoInputs.cache
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\AuliaPrakGrafkom2.AssemblyInfo.cs
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\AuliaPrakGrafkom2.csproj.CoreCompileInputs.cache
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\bin\Debug\net10.0-windows\AuliaPrakGrafkom2.exe
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\bin\Debug\net10.0-windows\AuliaPrakGrafkom2.deps.json
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\bin\Debug\net10.0-windows\AuliaPrakGrafkom2.runtimeconfig.json
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\bin\Debug\net10.0-windows\AuliaPrakGrafkom2.dll
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\bin\Debug\net10.0-windows\AuliaPrakGrafkom2.pdb
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\AuliaPrakGrafkom2.dll
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\refint\AuliaPrakGrafkom2.dll
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\AuliaPrakGrafkom2.pdb
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\AuliaPrakGrafkom2.genruntimeconfig.cache
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\ref\AuliaPrakGrafkom2.dll
+C:\Users\HP\source\repos\AuliaPrakGrafkom2\AuliaPrakGrafkom2\obj\Debug\net10.0-windows\AuliaPra.2EC81C9F.Up2Date

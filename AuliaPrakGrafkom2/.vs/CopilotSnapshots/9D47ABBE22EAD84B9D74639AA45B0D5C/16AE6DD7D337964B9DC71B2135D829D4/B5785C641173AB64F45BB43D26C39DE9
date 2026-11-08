@@ -1,0 +1,513 @@
+﻿namespace AuliaPrakGrafkom2
+{
+    public partial class Form1 : Form
+    {
+        // ============================================================
+        // KOMPONEN UI
+        // ============================================================
+
+        // --- Bagian Garis ---
+        private TextBox txtLineX1 = null!;
+        private TextBox txtLineY1 = null!;
+        private TextBox txtLineX2 = null!;
+        private TextBox txtLineY2 = null!;
+        private Button btnDrawLine = null!;
+        private Button btnClearLine = null!;
+        private Panel pnlLineDasar = null!;
+        private Panel pnlLineDDA = null!;
+        private Panel pnlLineBresenham = null!;
+
+        // --- Bagian Lingkaran ---
+        private TextBox txtCircleXc = null!;
+        private TextBox txtCircleYc = null!;
+        private TextBox txtCircleRadius = null!;
+        private Button btnDrawCircle = null!;
+        private Button btnClearCircle = null!;
+        private Panel pnlCircleDasar = null!;
+        private Panel pnlCirclePolar = null!;
+        private Panel pnlCircleBresenham = null!;
+
+        // Bitmap back-buffer per kanvas agar gambar tidak hilang saat refresh/minimize
+        private readonly Dictionary<Panel, Bitmap> canvasBuffers = new();
+
+        // Ukuran kanvas
+        private const int CanvasSize = 220;
+
+        public Form1()
+        {
+            InitializeComponent();
+            BuildUi();
+        }
+
+        // ============================================================
+        // PEMBANGUNAN UI SECARA TERPROGRAM
+        // ============================================================
+        private void BuildUi()
+        {
+            Text = "Algoritma Penggambaran Objek Primitif";
+            ClientSize = new Size(960, 720);
+            StartPosition = FormStartPosition.CenterScreen;
+
+            // ---------- BAGIAN ATAS: PENGGAMBARAN GARIS ----------
+            var lblHeaderLine = new Label
+            {
+                Text = "PENGGAMBARAN GARIS",
+                Font = new Font(Font, FontStyle.Bold),
+                AutoSize = true,
+                Location = new Point(12, 12)
+            };
+            Controls.Add(lblHeaderLine);
+
+            // Panel input garis (kiri)
+            var pnlLineInput = new Panel
+            {
+                Location = new Point(12, 40),
+                Size = new Size(220, 250),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+            Controls.Add(pnlLineInput);
+
+            var lblColX = new Label { Text = "X", AutoSize = true, Location = new Point(70, 10) };
+            var lblColY = new Label { Text = "Y", AutoSize = true, Location = new Point(140, 10) };
+            pnlLineInput.Controls.Add(lblColX);
+            pnlLineInput.Controls.Add(lblColY);
+
+            var lblRow1 = new Label { Text = "1", AutoSize = true, Location = new Point(15, 38) };
+            txtLineX1 = new TextBox { Text = "20", Location = new Point(55, 35), Size = new Size(60, 23) };
+            txtLineY1 = new TextBox { Text = "20", Location = new Point(125, 35), Size = new Size(60, 23) };
+            pnlLineInput.Controls.Add(lblRow1);
+            pnlLineInput.Controls.Add(txtLineX1);
+            pnlLineInput.Controls.Add(txtLineY1);
+
+            var lblRow2 = new Label { Text = "2", AutoSize = true, Location = new Point(15, 68) };
+            txtLineX2 = new TextBox { Text = "180", Location = new Point(55, 65), Size = new Size(60, 23) };
+            txtLineY2 = new TextBox { Text = "150", Location = new Point(125, 65), Size = new Size(60, 23) };
+            pnlLineInput.Controls.Add(lblRow2);
+            pnlLineInput.Controls.Add(txtLineX2);
+            pnlLineInput.Controls.Add(txtLineY2);
+
+            btnDrawLine = new Button { Text = "Gambar", Location = new Point(20, 110), Size = new Size(180, 30) };
+            btnDrawLine.Click += BtnDrawLine_Click;
+            btnClearLine = new Button { Text = "Bersihkan", Location = new Point(20, 150), Size = new Size(180, 30) };
+            btnClearLine.Click += BtnClearLine_Click;
+            pnlLineInput.Controls.Add(btnDrawLine);
+            pnlLineInput.Controls.Add(btnClearLine);
+
+            // Tiga kanvas garis berjejer horizontal
+            pnlLineDasar = CreateCanvas("DASAR", 250, 40);
+            pnlLineDDA = CreateCanvas("DDA", 485, 40);
+            pnlLineBresenham = CreateCanvas("Bresenham", 720, 40);
+
+            // ---------- BAGIAN BAWAH: PENGGAMBARAN LINGKARAN ----------
+            var lblHeaderCircle = new Label
+            {
+                Text = "PENGGAMBARAN LINGKARAN",
+                Font = new Font(Font, FontStyle.Bold),
+                AutoSize = true,
+                Location = new Point(12, 360)
+            };
+            Controls.Add(lblHeaderCircle);
+
+            // Panel input lingkaran (kiri)
+            var pnlCircleInput = new Panel
+            {
+                Location = new Point(12, 388),
+                Size = new Size(220, 250),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+            Controls.Add(pnlCircleInput);
+
+            var lblColXc = new Label { Text = "X", AutoSize = true, Location = new Point(70, 10) };
+            var lblColYc = new Label { Text = "Y", AutoSize = true, Location = new Point(140, 10) };
+            pnlCircleInput.Controls.Add(lblColXc);
+            pnlCircleInput.Controls.Add(lblColYc);
+
+            var lblCenter = new Label { Text = "C", AutoSize = true, Location = new Point(15, 38) };
+            txtCircleXc = new TextBox { Text = "110", Location = new Point(55, 35), Size = new Size(60, 23) };
+            txtCircleYc = new TextBox { Text = "110", Location = new Point(125, 35), Size = new Size(60, 23) };
+            pnlCircleInput.Controls.Add(lblCenter);
+            pnlCircleInput.Controls.Add(txtCircleXc);
+            pnlCircleInput.Controls.Add(txtCircleYc);
+
+            var lblRadius = new Label { Text = "Radius", AutoSize = true, Location = new Point(15, 68) };
+            txtCircleRadius = new TextBox { Text = "80", Location = new Point(70, 65), Size = new Size(60, 23) };
+            pnlCircleInput.Controls.Add(lblRadius);
+            pnlCircleInput.Controls.Add(txtCircleRadius);
+
+            btnDrawCircle = new Button { Text = "Gambar", Location = new Point(20, 110), Size = new Size(180, 30) };
+            btnDrawCircle.Click += BtnDrawCircle_Click;
+            btnClearCircle = new Button { Text = "Bersihkan", Location = new Point(20, 150), Size = new Size(180, 30) };
+            btnClearCircle.Click += BtnClearCircle_Click;
+            pnlCircleInput.Controls.Add(btnDrawCircle);
+            pnlCircleInput.Controls.Add(btnClearCircle);
+
+            // Tiga kanvas lingkaran berjejer horizontal
+            pnlCircleDasar = CreateCanvas("DASAR", 250, 388);
+            pnlCirclePolar = CreateCanvas("Polar", 485, 388);
+            pnlCircleBresenham = CreateCanvas("Bresenham", 720, 388);
+        }
+
+        /// <summary>
+        /// Membuat satu kanvas (Panel) beserta label judul di atasnya,
+        /// lengkap dengan Bitmap back-buffer dan event Paint.
+        /// </summary>
+        private Panel CreateCanvas(string title, int x, int y)
+        {
+            var lbl = new Label
+            {
+                Text = title,
+                AutoSize = true,
+                Location = new Point(x, y)
+            };
+            Controls.Add(lbl);
+
+            var panel = new Panel
+            {
+                Location = new Point(x, y + 22),
+                Size = new Size(CanvasSize, CanvasSize),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.White
+            };
+
+            // Back-buffer: gambar disimpan di Bitmap, event Paint hanya meng-copy-nya
+            var bmp = new Bitmap(CanvasSize, CanvasSize);
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.Clear(Color.White);
+            }
+            canvasBuffers[panel] = bmp;
+
+            panel.Paint += (s, e) =>
+            {
+                e.Graphics.DrawImageUnscaled(canvasBuffers[(Panel)s!], 0, 0);
+            };
+
+            Controls.Add(panel);
+            return panel;
+        }
+
+        // ============================================================
+        // HELPER PENGGAMBARAN PIKSEL
+        // ============================================================
+
+        /// <summary>
+        /// Menggambar satu piksel pada konteks Graphics.
+        /// Ukuran 2x2 agar piksel jelas terlihat pada layar resolusi tinggi.
+        /// </summary>
+        private void PutPixel(Graphics g, int x, int y, Brush brush)
+        {
+            g.FillRectangle(brush, x, y, 2, 2);
+        }
+
+        /// <summary>Menggambar satu piksel langsung ke back-buffer kanvas.</summary>
+        private void PutPixel(Panel canvas, int x, int y, Brush brush)
+        {
+            using var g = Graphics.FromImage(canvasBuffers[canvas]);
+            PutPixel(g, x, y, brush);
+        }
+
+        private void ClearCanvas(Panel canvas)
+        {
+            using var g = Graphics.FromImage(canvasBuffers[canvas]);
+            g.Clear(Color.White);
+            canvas.Invalidate();
+        }
+
+        // ============================================================
+        // EVENT HANDLER TOMBOL
+        // ============================================================
+        private void BtnDrawLine_Click(object? sender, EventArgs e)
+        {
+            // Validasi input integer
+            if (!int.TryParse(txtLineX1.Text, out int x1) ||
+                !int.TryParse(txtLineY1.Text, out int y1) ||
+                !int.TryParse(txtLineX2.Text, out int x2) ||
+                !int.TryParse(txtLineY2.Text, out int y2))
+            {
+                MessageBox.Show("Input garis harus berupa bilangan bulat!", "Input Tidak Valid",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Gambar garis yang sama di ketiga kanvas dengan algoritma berbeda
+            DrawLineDasar(pnlLineDasar, x1, y1, x2, y2);
+            DrawLineDDA(pnlLineDDA, x1, y1, x2, y2);
+            DrawLineBresenham(pnlLineBresenham, x1, y1, x2, y2);
+
+            pnlLineDasar.Invalidate();
+            pnlLineDDA.Invalidate();
+            pnlLineBresenham.Invalidate();
+        }
+
+        private void BtnClearLine_Click(object? sender, EventArgs e)
+        {
+            ClearCanvas(pnlLineDasar);
+            ClearCanvas(pnlLineDDA);
+            ClearCanvas(pnlLineBresenham);
+        }
+
+        private void BtnDrawCircle_Click(object? sender, EventArgs e)
+        {
+            // Validasi input integer
+            if (!int.TryParse(txtCircleXc.Text, out int xc) ||
+                !int.TryParse(txtCircleYc.Text, out int yc) ||
+                !int.TryParse(txtCircleRadius.Text, out int r))
+            {
+                MessageBox.Show("Input lingkaran harus berupa bilangan bulat!", "Input Tidak Valid",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (r <= 0)
+            {
+                MessageBox.Show("Radius harus lebih besar dari nol!", "Input Tidak Valid",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Gambar lingkaran yang sama di ketiga kanvas dengan algoritma berbeda
+            DrawCircleDasar(pnlCircleDasar, xc, yc, r);
+            DrawCirclePolar(pnlCirclePolar, xc, yc, r);
+            DrawCircleBresenham(pnlCircleBresenham, xc, yc, r);
+
+            pnlCircleDasar.Invalidate();
+            pnlCirclePolar.Invalidate();
+            pnlCircleBresenham.Invalidate();
+        }
+
+        private void BtnClearCircle_Click(object? sender, EventArgs e)
+        {
+            ClearCanvas(pnlCircleDasar);
+            ClearCanvas(pnlCirclePolar);
+            ClearCanvas(pnlCircleBresenham);
+        }
+
+        // ============================================================
+        // ALGORITMA 2.1 - GARIS DASAR
+        // Gradien m = (y2-y1)/(x2-x1), iterasi x dengan dx = 1,
+        // y dinaikkan sebesar m setiap langkah.
+        // ============================================================
+        private void DrawLineDasar(Panel canvas, int x1, int y1, int x2, int y2)
+        {
+            Brush brush = Brushes.Blue;
+
+            // Kasus khusus: garis vertikal (x1 == x2), gradien tak terdefinisi
+            if (x1 == x2)
+            {
+                int yStart = Math.Min(y1, y2);
+                int yEnd = Math.Max(y1, y2);
+                for (int yi = yStart; yi <= yEnd; yi++)
+                {
+                    PutPixel(canvas, x1, yi, brush);
+                }
+                return;
+            }
+
+            // Pastikan iterasi selalu dari x kecil ke x besar (x1 <= x2)
+            if (x1 > x2)
+            {
+                (x1, x2) = (x2, x1);
+                (y1, y2) = (y2, y1);
+            }
+
+            double m = (double)(y2 - y1) / (x2 - x1);
+            double y = y1;
+
+            for (int x = x1; x <= x2; x++)
+            {
+                PutPixel(canvas, x, (int)Math.Round(y), brush);
+                y += m; // y* = y + m
+            }
+        }
+
+        // ============================================================
+        // ALGORITMA 2.2 - GARIS DDA (Digital Differential Analyzer)
+        // Langkah s = max(|dx|, |dy|), inkremen dx/s dan dy/s.
+        // ============================================================
+        private void DrawLineDDA(Panel canvas, int x1, int y1, int x2, int y2)
+        {
+            Brush brush = Brushes.DarkGreen;
+
+            int dx = x2 - x1;
+            int dy = y2 - y1;
+
+            // Jumlah langkah = selisih terpanjang agar garis tidak putus
+            int steps = Math.Max(Math.Abs(dx), Math.Abs(dy));
+
+            // Garis berupa satu titik (x1==x2 dan y1==y2)
+            if (steps == 0)
+            {
+                PutPixel(canvas, x1, y1, brush);
+                return;
+            }
+
+            double xInc = (double)dx / steps;
+            double yInc = (double)dy / steps;
+
+            double x = x1;
+            double y = y1;
+
+            for (int i = 0; i <= steps; i++)
+            {
+                PutPixel(canvas, (int)Math.Round(x), (int)Math.Round(y), brush);
+                x += xInc;
+                y += yInc;
+            }
+        }
+
+        // ============================================================
+        // ALGORITMA 2.3 - GARIS BRESENHAM (8 OKTAN, INTEGER PENUH)
+        // Parameter keputusan d = 2*db - da; langkah lurus (m1) atau
+        // diagonal (m2) dipilih berdasarkan tanda d.
+        // ============================================================
+        private void DrawLineBresenham(Panel canvas, int x1, int y1, int x2, int y2)
+        {
+            Brush brush = Brushes.Red;
+
+            int dx = x2 - x1;
+            int dy = y2 - y1;
+            int absDx = Math.Abs(dx);
+            int absDy = Math.Abs(dy);
+
+            int x = x1;
+            int y = y1;
+
+            // da = sumbu dominan (langkah selalu diambil), db = sumbu minor
+            int da = Math.Max(absDx, absDy);
+            int db = Math.Min(absDx, absDy);
+
+            // Parameter keputusan awal
+            int d = 2 * db - da;
+
+            // Tentukan langkah lurus (m1) dan langkah diagonal (m2)
+            // berdasarkan tanda dx, dy, dan sumbu dominan
+            int m1x, m1y, m2x, m2y;
+            if (absDx >= absDy)
+            {
+                // Sumbu X dominan: langkah lurus = geser X saja
+                m1x = Math.Sign(dx); m1y = 0;
+                m2x = Math.Sign(dx); m2y = Math.Sign(dy);
+            }
+            else
+            {
+                // Sumbu Y dominan: langkah lurus = geser Y saja
+                m1x = 0; m1y = Math.Sign(dy);
+                m2x = Math.Sign(dx); m2y = Math.Sign(dy);
+            }
+
+            PutPixel(canvas, x, y, brush);
+
+            // Iterasi maksimal da langkah sampai mencapai titik akhir
+            for (int i = 0; i < da; i++)
+            {
+                if (d >= 0)
+                {
+                    // Langkah diagonal: kedua sumbu bergeser
+                    x += m2x;
+                    y += m2y;
+                    d += 2 * db - 2 * da;
+                }
+                else
+                {
+                    // Langkah lurus: hanya sumbu dominan bergeser
+                    x += m1x;
+                    y += m1y;
+                    d += 2 * db;
+                }
+                PutPixel(canvas, x, y, brush);
+
+                if (x == x2 && y == y2)
+                {
+                    break;
+                }
+            }
+        }
+
+        // ============================================================
+        // ALGORITMA 2.4 - LINGKARAN DASAR
+        // Persamaan lingkaran y = yc +/- sqrt(r^2 - x^2),
+        // iterasi x dari -r sampai r.
+        // ============================================================
+        private void DrawCircleDasar(Panel canvas, int xc, int yc, int r)
+        {
+            Brush brush = Brushes.Blue;
+
+            for (int x = -r; x <= r; x++)
+            {
+                double yOffset = Math.Sqrt(r * r - x * x);
+                double y1 = yc + yOffset; // setengah lingkaran atas
+                double y2 = yc - yOffset; // setengah lingkaran bawah
+
+                PutPixel(canvas, xc + x, (int)Math.Round(y1), brush);
+                PutPixel(canvas, xc + x, (int)Math.Round(y2), brush);
+            }
+        }
+
+        // ============================================================
+        // ALGORITMA 2.5 - LINGKARAN POLAR
+        // x = xc + r*cos(theta), y = yc + r*sin(theta),
+        // theta dari 0 sampai 2*PI dengan step kecil.
+        // ============================================================
+        private void DrawCirclePolar(Panel canvas, int xc, int yc, int r)
+        {
+            Brush brush = Brushes.DarkGreen;
+
+            // Step sudut 1/r agar busur antar piksel <= 1 satuan (tidak putus),
+            // dibatasi maksimum 0.005 radian untuk radius kecil.
+            double step = Math.Min(1.0 / r, 0.005);
+
+            for (double theta = 0; theta <= 2 * Math.PI; theta += step)
+            {
+                double x = xc + r * Math.Cos(theta);
+                double y = yc + r * Math.Sin(theta);
+                PutPixel(canvas, (int)Math.Round(x), (int)Math.Round(y), brush);
+            }
+        }
+
+        // ============================================================
+        // ALGORITMA 2.6 & 2.7 - LINGKARAN BRESENHAM (MIDPOINT CIRCLE)
+        // Hanya menghitung satu oktan, lalu dicerminkan ke 8 titik
+        // simetris. Parameter keputusan d = 3 - 2r.
+        // ============================================================
+        private void DrawCircleBresenham(Panel canvas, int xc, int yc, int r)
+        {
+            Brush brush = Brushes.Red;
+
+            int x = 0;
+            int y = r;
+            int d = 3 - (2 * r);
+
+            DrawCirclePoints(canvas, xc, yc, x, y, brush);
+
+            while (x <= y)
+            {
+                x++;
+                if (d < 0)
+                {
+                    d = d + (4 * x) + 6;
+                }
+                else
+                {
+                    d = d + 4 * (x - y) + 10;
+                    y--;
+                }
+                DrawCirclePoints(canvas, xc, yc, x, y, brush);
+            }
+        }
+
+        /// <summary>
+        /// Menggambar 8 titik simetris oktan lingkaran dari satu titik (x, y).
+        /// </summary>
+        private void DrawCirclePoints(Panel canvas, int xc, int yc, int x, int y, Brush brush)
+        {
+            PutPixel(canvas, xc + x, yc + y, brush);
+            PutPixel(canvas, xc - x, yc + y, brush);
+            PutPixel(canvas, xc + x, yc - y, brush);
+            PutPixel(canvas, xc - x, yc - y, brush);
+            PutPixel(canvas, xc + y, yc + x, brush);
+            PutPixel(canvas, xc - y, yc + x, brush);
+            PutPixel(canvas, xc + y, yc - x, brush);
+            PutPixel(canvas, xc - y, yc - x, brush);
+        }
+    }
+}
